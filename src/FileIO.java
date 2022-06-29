@@ -1,6 +1,9 @@
 /**
  * TODO: BUG FIXES / THINGS TO DO
- *      1. Add edit functionality
+ *      1. Edit functionality needs a better way to compare the list to the name
+ *              a. using the list.contains() is messing with results! (ex.. if you enter k..
+ *              it thinks its talking about any name with the letter k in it)
+ *
  **/
 
 
@@ -26,7 +29,8 @@ public class FileIO {
         //TODO: Get data from user
         boolean userInteraction = true;
         while (userInteraction) {
-            System.out.println("1. View contacts\n2. Add a new contact\n3. Search a contact by name\n4. Delete an existing contact\n5. Exit\nEnter a number for your selection!");
+            System.out.println("1. View contacts\n2. Add a new contact\n3. Search a contact by name\n4. Delete an existing contact\n5. Exit\nEnter the number for your selection!");
+
             int answer = scanner.nextInt();
 
             //TODO: Reads the file
@@ -44,17 +48,23 @@ public class FileIO {
             //TODO: Write to the file / Edit existing file
             if (answer == 2) {
                 boolean canContinue = true;
-                System.err.println("Enter in the name you would like to add");
+                boolean dontContinue = false;
+                System.out.println("Enter in the name you would like to add");
                 scanner.nextLine();
                 String name = scanner.nextLine();
+                System.out.println(name.length());
+
 
                 //TODO: Checks to see if name exists in the list
                 lines = Files.readAllLines(filepath);
-                for (String line : lines) {
-                    if (line.toLowerCase().contains(name.toLowerCase())) {
 
+                for (String line : lines) {
+
+                    //line.toLowerCase().contains(name.toLowerCase())
+                    if (line.toLowerCase().contains(name.toLowerCase())) {
+                        String storedValue = line.toLowerCase();
                         //TODO: If name exists... choice of editing starts here
-                        System.err.println("Would you like to edit existing contact?[Y/N]");
+                        System.err.println("CONTACT EXISTS: Would you like to edit existing contact?[Y/N]");
                         String input = scanner.nextLine();
                         if (input.equalsIgnoreCase("y")) {
 
@@ -71,23 +81,48 @@ public class FileIO {
                                 }
                             });
 
+                            System.err.println("Would you like to change the current name?[Y/N]");
+                            String decision = scanner.nextLine();
+                            if (decision.equalsIgnoreCase("y")) {
+                                System.err.println("Enter in a new name");
+                                name = scanner.nextLine();
+
+                            } else if (decision.equalsIgnoreCase("n")) {
+                                continue;
+                            } else {
+                                System.err.println("Next time... try to enter [Y/N]");
+                                dontContinue = true;
+                            }
+
+                            if (dontContinue) {
+                                Files.write(filepath, List.of(storedValue), StandardOpenOption.APPEND);
+                                canContinue = false;
+                            } else {
+                                canContinue = true;
+                            }
+
+
                             //TODO: Sends user to enter in new phone number for existing contact
-                            canContinue = true;
-                        }
-                        if (input.equalsIgnoreCase("n")) {
+
+                        } else if (input.equalsIgnoreCase("n")) {
                             deleter.clear();
                             canContinue = false;
+                        } else {
+                            System.err.println("Next time... try to enter [Y/N]");
+                            canContinue = false;
                         }
+
                     } else {
                         //TODO: Gets the contacts that arent being edited to add back to text file
                         deleter.add(line); // this takes in the lines that did not match the user input
                     }
                 }
 
+
                 //TODO: If name doesn't exist then this part is fired off
                 if (canContinue) {
                     deleter.clear();
-                    System.err.println("Enter in the phone number you would like to add");
+                    System.out.println("Enter in the phone number you would like to add");
                     String number = String.valueOf(Long.parseLong(scanner.nextLine()));
 
                     //TODO: Checks if number is 10 digits in length
@@ -95,27 +130,27 @@ public class FileIO {
 
                         //TODO: Writes to the file
                         try {
-                            String userInfoToAdd = String.format("%s -- %s", name, number);
+                            String userInfoToAdd = String.format("%s -- %s", name.toLowerCase(), number);
                             Files.write(filepath, List.of(userInfoToAdd), StandardOpenOption.APPEND);
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
                     } else {
-                        System.err.println("10 digit number required");
+                        System.out.println("10 digit number required");
                     }
                 }
             }
 
             //TODO: Contact search functionality
             if (answer == 3) {
-                System.err.println("Enter the name of the contact you wish to search!");
+                System.out.println("Enter the name of the contact you wish to search!");
                 scanner.nextLine();
                 String searchFor = scanner.nextLine();
 
                 lines = Files.readAllLines(filepath);
                 for (String line : lines) {
                     if (line.toLowerCase().contains(searchFor.toLowerCase())) {
-                        System.err.println("\nSearch Results: " + line + "\n");
+                        System.out.println("\nSearch Results: " + line + "\n");
                     }
                 }
             }
@@ -143,7 +178,7 @@ public class FileIO {
 
                     for (String line : lines) {
                         if (line.contains(deleteContact)) { // if a name exists path will reset
-                            System.err.println("Deleting Contact: " + line);
+                            System.out.println("Deleting Contact: " + line);
                             Files.delete(filepath);
                             Files.createFile(filepath);
                         } else {
@@ -160,13 +195,13 @@ public class FileIO {
                 } else {
 
                     //TODO: Shows the user if they typed in invalid contact information
-                    System.err.println("THAT CONTACT DOESN'T EXIST!! ARE YOU TRYING TO BREAK ME!?!?");
+                    System.out.println("THAT CONTACT DOESN'T EXIST!! ARE YOU TRYING TO BREAK ME!?!?");
                 }
             }
 
             //TODO: Exit functionality
             if (answer == 5) {
-                System.err.println("Goodbye! :)");
+                System.out.println("Goodbye! :)");
                 userInteraction = false;
             }
         }
