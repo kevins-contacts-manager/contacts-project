@@ -1,3 +1,9 @@
+/**
+ * TODO: BUG FIXES / THINGS TO DO
+ *      1. Add edit functionality
+ **/
+
+
 package src;
 
 import java.io.File;
@@ -12,13 +18,10 @@ public class FileIO {
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
         List<String> lines;
-//        HashMap<String, Long> contactInfo = new HashMap<>();
-
 
         //TODO: Create a file path
         Path filepath = Paths.get("data", "contacts.txt");
-        ArrayList<String> tester = new ArrayList<>();
-
+        ArrayList<String> deleter = new ArrayList<>();
 
         //TODO: Get data from user
         boolean userInteraction = true;
@@ -80,10 +83,10 @@ public class FileIO {
                         }
                     } else {
                         System.err.println("10 digit number required");
-
                     }
                 }
             }
+
             //TODO: Contact search functionality
             if (answer == 3) {
                 System.err.println("Enter the name of the contact you wish to search!");
@@ -96,38 +99,52 @@ public class FileIO {
                         System.err.println("\nSearch Results: " + line + "\n");
                     }
                 }
-
-
             }
 
+            //TODO: Delete functionality
             if (answer == 4) {
                 System.out.println("Enter the contact name you want to delete!");
                 scanner.nextLine();
                 String deleteContact = scanner.nextLine();
-                tester.clear();
                 lines = Files.readAllLines(filepath);
-                System.out.println(lines);
+                boolean lineExists = false; // this sets up the condition to check if the contact exists or not
+
+                //TODO: Checks to see if contact exists
                 for (String line : lines) {
-                    if (line.contains(deleteContact)) {
-                        Files.delete(filepath);
-                        Files.createFile(filepath);
-                    } else {
-
-                        tester.add(line);
-                        System.out.println(tester);
-
+                    if (line.indexOf(deleteContact) == 0) {
+                        lineExists = true;
+                        break;
                     }
                 }
-                tester.forEach((test) -> {
-                    try {
-                        Files.write(filepath, List.of(test), StandardOpenOption.APPEND);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+                //TODO: Delete process for if user input actually exists
+                if (lineExists) {
+                    deleter.clear(); // this clears the ArrayList<> deleter;
+                    lines = Files.readAllLines(filepath);
 
+                    for (String line : lines) {
+                        if (line.contains(deleteContact)) { // if a name exists path will reset
+                            System.err.println("Deleting Contact: " + line);
+                            Files.delete(filepath);
+                            Files.createFile(filepath);
+                        } else {
+                            deleter.add(line); // this takes in the lines that did not match the user input
+                        }
+                    }
+                    deleter.forEach((del) -> { // this adds back to the text file
+                        try {
+                            Files.write(filepath, List.of(del), StandardOpenOption.APPEND);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+
+                } else {
+                    //TODO: Shows the user if they typed in invalid contact information
+                    System.err.println("THAT CONTACT DOESN'T EXIST!! ARE YOU TRYING TO BREAK ME!?!?");
+                }
             }
 
+            //TODO: Exit functionality
             if (answer == 5) {
                 System.err.println("Goodbye! :)");
                 userInteraction = false;
