@@ -3,7 +3,6 @@
  *      1. Edit functionality needs a better way to compare the list to the name
  *              a. using the list.contains() is messing with results! (ex.. if you enter k..
  *              it thinks its talking about any name with the letter k in it)
- *
  **/
 
 
@@ -52,8 +51,6 @@ public class FileIO {
                 System.out.println("Enter in the name you would like to add");
                 scanner.nextLine();
                 String name = scanner.nextLine();
-                System.out.println(name.length());
-
 
                 //TODO: Checks to see if name exists in the list
                 lines = Files.readAllLines(filepath);
@@ -101,7 +98,6 @@ public class FileIO {
                                 canContinue = true;
                             }
 
-
                             //TODO: Sends user to enter in new phone number for existing contact
 
                         } else if (input.equalsIgnoreCase("n")) {
@@ -117,7 +113,6 @@ public class FileIO {
                         deleter.add(line); // this takes in the lines that did not match the user input
                     }
                 }
-
 
                 //TODO: If name doesn't exist then this part is fired off
                 if (canContinue) {
@@ -143,6 +138,8 @@ public class FileIO {
 
             //TODO: Contact search functionality
             if (answer == 3) {
+                boolean noContact = false;
+                boolean hasContact = false;
                 System.out.println("Enter the name of the contact you wish to search!");
                 scanner.nextLine();
                 String searchFor = scanner.nextLine();
@@ -150,8 +147,17 @@ public class FileIO {
                 lines = Files.readAllLines(filepath);
                 for (String line : lines) {
                     if (line.toLowerCase().contains(searchFor.toLowerCase())) {
-                        System.out.println("\nSearch Results: " + line + "\n");
+                        hasContact = true;
+                        System.err.println("\nSearch Results: " + line + "\n");
+                    } else {
+                        noContact = true;
                     }
+                }
+                if (hasContact){
+                    noContact = false;
+                }
+                if (noContact){
+                    System.out.println("CONTACT DOESNT EXIST!");
                 }
             }
 
