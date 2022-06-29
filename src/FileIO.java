@@ -57,17 +57,36 @@ public class FileIO {
                         System.err.println("Would you like to edit existing contact?[Y/N]");
                         String input = scanner.nextLine();
                         if (input.equalsIgnoreCase("y")) {
-                            System.err.println("Content coming soon!");
-                            canContinue = false;
+
+                            //TODO: Remakes the text file
+                            Files.delete(filepath);
+                            Files.createFile(filepath);
+
+                            //TODO: Adds the contacts not being edited back to the text file
+                            deleter.forEach((del) -> { // this adds back to the text file
+                                try {
+                                    Files.write(filepath, List.of(del), StandardOpenOption.APPEND);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            });
+
+                            //TODO: Sends user to enter in new phone number for existing contact
+                            canContinue = true;
                         }
                         if (input.equalsIgnoreCase("n")) {
+                            deleter.clear();
                             canContinue = false;
                         }
+                    } else {
+                        //TODO: Gets the contacts that arent being edited to add back to text file
+                        deleter.add(line); // this takes in the lines that did not match the user input
                     }
                 }
 
                 //TODO: If name doesn't exist then this part is fired off
                 if (canContinue) {
+                    deleter.clear();
                     System.err.println("Enter in the phone number you would like to add");
                     String number = String.valueOf(Long.parseLong(scanner.nextLine()));
 
@@ -116,6 +135,7 @@ public class FileIO {
                         break;
                     }
                 }
+
                 //TODO: Delete process for if user input actually exists
                 if (lineExists) {
                     deleter.clear(); // this clears the ArrayList<> deleter;
@@ -137,8 +157,8 @@ public class FileIO {
                             e.printStackTrace();
                         }
                     });
-
                 } else {
+
                     //TODO: Shows the user if they typed in invalid contact information
                     System.err.println("THAT CONTACT DOESN'T EXIST!! ARE YOU TRYING TO BREAK ME!?!?");
                 }
